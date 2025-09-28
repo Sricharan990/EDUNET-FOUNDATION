@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineReview - Movie Review Platform</title>
+    <style>
+        /* ===== Body & Container ===== */
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab, #ff5f6d);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+        .header p {
+            font-size: 1.2rem;
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+
+        /* ===== Search Section ===== */
+        .search-section {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .search-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-input, .sort-select {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        .search-input:focus, .sort-select:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+        .search-btn {
+            padding: 15px 30px;
+            background: #ffd700;
+            color: #1f1c2c;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .search-btn:hover {
+            background: #ffb700;
+        }
+
+        /* ===== Movies Grid ===== */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .movie-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .movie-poster {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            background: #ccc;
+        }
+        .movie-info {
+            padding: 20px;
+        }
+        .movie-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: #ffd700;
+        }
+        .movie-year {
+            color: #eee;
+            margin-bottom: 10px;
+        }
+        .movie-plot {
+            color: #ddd;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== Rating ===== */
+        .rating-section {
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 10px;
+        }
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .star {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star.active, .star:hover {
+            color: #ffd700;
+        }
+        .review-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .submit-review {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-review:hover {
+            background: #218838;
+        }
+        .user-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .user-review {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #ffd700;
+        }
+
+        /* ===== My Reviews Section ===== */
+        .my-reviews {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .my-reviews h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        .review-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffd700;
+        }
+        .review-movie-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        .review-rating {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .review-actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .edit-btn { background: #007bff; color: white; }
+        .delete-btn { background: #dc3545; color: white; }
+
+        /* ===== Modal ===== */
+        .modal {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background: #1f1c2c;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎬 CineReview</h1>
+        <p>Discover, Rate & Review Your Favorite Movies</p>
+    </div>
+
+    <div class="search-section">
+        <form class="search-form" id="searchForm">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="Search for movies..."
+                required
+            >
+            <select class="sort-select" id="sortSelect">
+                <option value="relevance">Sort by Relevance</option>
+                <option value="release_desc">Release Date (Newest)</option>
+                <option value="release_asc">Release Date (Oldest)</option>
+            </select>
+            <button type="submit" class="search-btn">🔍 Search Movies</button>
+        </form>
+        <div id="recentSearches"></div>
+        <div id="searchResults"></div>
+    </div>
+
+    <div class="my-reviews">
+        <h2>📝 My Reviews</h2>
+        <div id="myReviews">
+            <p style="color: #ddd; font-style: italic;">No reviews yet. Search for movies above and start rating!</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for movie details -->
+<div class="modal" id="movieModal">
+    <div class="modal-content">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<script>
+class MovieReviewPlatform {
+    constructor() {
+        this.apiKey = '4e44d9029b1270a757cddc766a1bcb63';
+        this.baseUrl = 'https://api.themoviedb.org/3';
+        this.imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
+        this.reviews = this.loadReviews();
+        this.searchHistory = this.loadSearchHistory();
+        this.initializeEventListeners();
+        this.displayMyReviews();
+        this.displayRecentSearches();
+    }
+
+    initializeEventListeners() {
+        document.getElementById('searchForm').addEventListener('submit', e => {
+            e.preventDefault();
+            this.searchMovies();
+        });
+
+        document.getElementById('modalClose').addEventListener('click', () => {
+            document.getElementById('movieModal').style.display = 'none';
+        });
+    }
+
+    saveSearchHistory(query) {
+        this.searchHistory.unshift(query);
+        this.searchHistory = [...new Set(this.searchHistory)].slice(0, 5);
+        localStorage.setItem('movieSearchHistory', JSON.stringify(this.searchHistory));
+        this.displayRecentSearches();
+    }
+
+    loadSearchHistory() {
+        try { return JSON.parse(localStorage.getItem('movieSearchHistory') || '[]'); } 
+        catch { return []; }
+    }
+
+    displayRecentSearches() {
+        const container = document.getElementById('recentSearches');
+        if (this.searchHistory.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        container.innerHTML = `<p style="margin-top:10px;color:#ffd700;">Recent Searches: ${this.searchHistory.map(q=>`<span class="recent-query" style="cursor:pointer;" onclick="platform.searchMovies('${q}')">${q}</span>`).join(', ')}</p>`;
+    }
+
+    async searchMovies(presetQuery=null) {
+        const searchInput = document.getElementById('searchInput');
+        const query = presetQuery || searchInput.value.trim();
+        const sortOption = document.getElementById('sortSelect').value;
+        const resultsContainer = document.getElementById('searchResults');
+        if (!query) return;
+
+        if(!presetQuery) this.saveSearchHistory(query);
+
+        resultsContainer.innerHTML = '<div class="loading">🔍 Searching for movies...</div>';
+
+        try {
+            const response = await fetch(`${this.baseUrl}/search/movie?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&language=en-US&page=1`);
+            if(!response.ok) throw new Error('Failed to fetch movies');
+            let data = await response.json();
+            let movies = data.results;
+
+            // Sorting
+            if(sortOption === 'release_desc') movies.sort((a,b)=> new Date(b.release_date) - new Date(a.release_date));
+            if(sortOption === 'release_asc') movies.sort((a,b)=> new Date(a.release_date) - new Date(b.release_date));
+
+            this.displayMovies(movies);
+        } catch(e) {
+            resultsContainer.innerHTML = `<div class="error">❌ Unable to search movies.</div>`;
+        }
+    }
+
+    displayMovies(movies) {
+        const resultsContainer = document.getElementById('searchResults');
+        if(!movies || movies.length === 0){
+            resultsContainer.innerHTML = '<div class="error">No movies found.</div>';
+            return;
+        }
+
+        resultsContainer.innerHTML = `<div class="movies-grid">
+            ${movies.slice(0, 6).map(movie=>{
+                const userReview = this.reviews[movie.id];
+                const avgRating = this.calculateAverageRating(movie.id);
+                const posterUrl = movie.poster_path ? `${this.imageBaseUrl}${movie.poster_path}` : 'https://via.placeholder.com/300x400?text=No+Image';
+
+                return `<div class="movie-card" data-movie-id="${movie.id}">
+                    <img src="${posterUrl}" class="movie-poster">
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="movie-year">📅 ${movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'}</p>
+                        <p class="movie-plot">${movie.overview || 'No description available.'}</p>
+                        <div class="rating-section">
+                            ${userReview ? `<div class="user-rating"><span>Your Rating:</span> <span class="review-rating">${'⭐'.repeat(userReview.rating)}</span> (${userReview.rating}/5)</div>
+                            <div class="user-review"><strong>Your Review:</strong><br>${userReview.review}</div>` :
+                            `<div class="stars" data-movie-id="${movie.id}">${[1,2,3,4,5].map(i=>`<span class="star" data-rating="${i}">⭐</span>`).join('')}</div>
+                            <textarea class="review-input" placeholder="Write your review..." data-movie-id="${movie.id}"></textarea>
+                            <button class="submit-review" data-movie-id="${movie.id}" data-movie-title="${movie.title}">Submit Review</button>`}
+                            ${avgRating>0 ? `<p style="margin-top:5px;color:#ffd700;">Average Rating: ${'⭐'.repeat(avgRating)} (${avgRating}/5)</p>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>`;
+        this.attachMovieEventListeners();
+    }
+
+    attachMovieEventListeners() {
+        document.querySelectorAll('.stars').forEach(starsContainer=>{
+            const stars = starsContainer.querySelectorAll('.star');
+            let currentRating=0;
+            stars.forEach((star,index)=>{
+                star.addEventListener('mouseenter',()=>{this.highlightStars(stars,index+1)});
+                star.addEventListener('mouseleave',()=>{this.highlightStars(stars,currentRating)});
+                star.addEventListener('click',()=>{currentRating=index+1; this.highlightStars(stars,currentRating); starsContainer.dataset.rating=currentRating});
+            });
+        });
+        document.querySelectorAll('.submit-review').forEach(btn=>{
+            btn.addEventListener('click',()=>{this.submitReview(btn)});
+        });
+        document.querySelectorAll('.movie-card').forEach(card=>{
+            card.addEventListener('click',(e)=>{
+                if(!e.target.classList.contains('star') && !e.target.classList.contains('submit-review') && e.target.tagName!=='TEXTAREA') this.showMovieDetails(card.dataset.movieId);
+            });
+        });
+    }
+
+    highlightStars(stars,rating){
+        stars.forEach((star,index)=>{star.classList.toggle('active',index<rating)});
+    }
+
+    submitReview(button){
+        const movieId = button.dataset.movieId;
+        const movieTitle = button.dataset.movieTitle;
+        const starsContainer = document.querySelector(`.stars[data-movie-id="${movieId}"]`);
+        const reviewTextarea = document.querySelector(`.review-input[data-movie-id="${movieId}"]`);
+        const rating = parseInt(starsContainer?.dataset.rating || 0);
+        const reviewText = reviewTextarea?.value.trim() || '';
+
+        if(rating===0){ alert('Please select a rating!'); return;}
+        if(!reviewText){ alert('Please write a review!'); return;}
+
+        this.reviews[movieId] = { movieTitle, rating, review: reviewText, date: new Date().toLocaleDateString() };
+        this.saveReviews();
+        this.displayMyReviews();
+        this.searchMovies(document.getElementById('searchInput').value);
+    }
+
+    calculateAverageRating(movieId){
+        const review = this.reviews[movieId];
+        return review ? review.rating : 0;
+    }
+
+    displayMyReviews(){
+        const container = document.getElementById('myReviews');
+        const reviewsArray = Object.entries(this.reviews);
+        if(reviewsArray.length===0){ container.innerHTML='<p style="color: #ddd; font-style: italic;">No reviews yet.</p>'; return;}
+
+        container.innerHTML = reviewsArray.map(([movieId,review])=>`<div class="review-item">
+            <div class="review-movie-title">${review.movieTitle}</div>
+            <div class="review-rating">${'⭐'.repeat(review.rating)} (${review.rating}/5)</div>
+            <div>${review.review}</div>
+            <small style="color:#ccc;">Reviewed on ${review.date}</small>
+            <div class="review-actions">
+                <button class="edit-btn" onclick="platform.editReview('${movieId}')">Edit</button>
+                <button class="delete-btn" onclick="platform.deleteReview('${movieId}')">Delete</button>
+            </div>
+        </div>`).join('');
+    }
+
+    editReview(movieId){
+        const review = this.reviews[movieId];
+        const newReview = prompt("Edit your review:", review.review);
+        const newRating = parseInt(prompt("Edit your rating (1-5):", review.rating));
+        if(newReview && newRating>=1 && newRating<=5){
+            this.reviews[movieId] = {...review, review:newReview, rating:newRating, date:new Date().toLocaleDateString()};
+            this.saveReviews();
+            this.displayMyReviews();
+            this.searchMovies(document.getElementById('searchInput').value);
+        }
+    }
+
+    deleteReview(movieId){
+        if(confirm("Are you sure you want to delete this review?")){
+            delete this.reviews[movieId];
+            this.saveReviews();
+            this.displayMyReviews();
+            this.searchMovies(document.getElementById('searchInput').value);
+        }
+    }
+
+    loadReviews(){ try{ return JSON.parse(localStorage.getItem('movieReviews')||'{}');}catch{return {};}}
+    saveReviews(){ localStorage.setItem('movieReviews',JSON.stringify(this.reviews));}
+
+    async showMovieDetails(movieId){
+        const modal = document.getElementById('movieModal');
+        const modalContent = document.getElementById('modalContent');
+        modalContent.innerHTML = 'Loading...';
+        modal.style.display = 'flex';
+
+        try{
+            const response = await fetch(`${this.baseUrl}/movie/${movieId}?api_key=${this.apiKey}&append_to_response=videos,credits`);
+            if(!response.ok) throw new Error();
+            const data = await response.json();
+            const trailer = data.videos.results.find(v=>v.type==='Trailer' && v.site==='YouTube');
+            modalContent.innerHTML = `<h2>${data.title} (${new Date(data.release_date).getFullYear()})</h2>
+                <p>${data.overview}</p>
+                <p><strong>Genres:</strong> ${data.genres.map(g=>g.name).join(', ')}</p>
+                <p><strong>Cast:</strong> ${data.credits.cast.slice(0,5).map(c=>c.name).join(', ')}</p>
+                ${trailer?`<iframe width="100%" height="400" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>`:''}`;
+        }catch{
+            modalContent.innerHTML = '<p>Unable to load movie details.</p>';
+        }
+    }
+}
+
+// Initialize platform
+const platform = new MovieReviewPlatform();
+</script>
+</body>
+</html>
